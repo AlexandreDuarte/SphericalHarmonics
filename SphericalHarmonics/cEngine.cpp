@@ -77,67 +77,74 @@ void Engine::render(double* delta_time, double zoom) {
         b_change_lm = false;
     }
 
+    for (int i = 0; i < 36; i++) {
 
-    glBindVertexArray(*VAO);
+        glBindVertexArray(*(VAO + i));
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *(EBO + 1));
 
-        glDrawElements(GL_TRIANGLE_STRIP, points->size_ind, GL_UNSIGNED_INT, (void*)(0));
+        glDrawElements(GL_TRIANGLE_STRIP, (points + i)->size_ind/2, GL_UNSIGNED_INT, (void*)(0));
 
+        glDrawElements(GL_TRIANGLE_STRIP, (points + i)->size_ind/4, GL_UNSIGNED_INT, (void*)(((points + 1)->size_ind/2)*sizeof(unsigned int)));
 
-
-        /*for (int r = 0; r < 20; r++) {
-            glDrawElements(GL_TRIANGLE_STRIP, 21, GL_UNSIGNED_INT, (void*)(42 * 4 * (2 * r)));
-        }
-
-
-        for (int r = 0; r < 20; r++) {
-            glDrawElements(GL_TRIANGLE_STRIP, 21, GL_UNSIGNED_INT, (void*)(42 * 4 * (2 * r) + 21 * 4));
-        }
-
-
-        for (int r = 0; r < 20; r++) {
-            glDrawElements(GL_TRIANGLE_STRIP, 21, GL_UNSIGNED_INT, (void*)(42*4*(2*r + 1)));
-        }
-
-        for (int r = 0; r < 20; r++) {
-            glDrawElements(GL_TRIANGLE_STRIP, 21, GL_UNSIGNED_INT, (void*)(42 * 4 * (2 * r + 1) + 21 * 4));
-        }*/
         glBindVertexArray(0);
+
+    }
 
 }
 
 void Engine::create_points() {
 
-
-    cSphericalHarmonics::calculateSphericalHarmonic(points, l, m);
-
-    glGenVertexArrays(1, VAO);
-    glGenBuffers(1, VBO);
-    glGenBuffers(1, EBO);
+    points = new cSphericalHarmonics::points_array[36];
+    VAO = new unsigned int[36];
+    VBO = new unsigned int[36];
+    EBO = new unsigned int[36];
 
 
-    glBindVertexArray(*VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    glBufferData(GL_ARRAY_BUFFER, ((points)->size-1) * sizeof(double), points->p_array, GL_STATIC_DRAW);
+    glGenVertexArrays(36, VAO);
+    glGenBuffers(36, VBO);
+    glGenBuffers(36, EBO);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, points->size_ind * sizeof(unsigned int), points->ind_array, GL_STATIC_DRAW);
+    l = 0;
+    m = -l;
 
-    glVertexAttribLPointer(0, 3, GL_DOUBLE, 4 * sizeof(double), (void*)(0));
-    glEnableVertexAttribArray(0);
+    for (int i = 0; i < 36; i++) {
 
-
-    glVertexAttribLPointer(1, 1, GL_DOUBLE, 4 * sizeof(double), (void*)(3 * sizeof(double)));
-    glEnableVertexAttribArray(1);
-
-    //glVertexAttribLPointer(1, 1, GL_DOUBLE, 4 * sizeof(double), (void*)(3 * sizeof(double)));
-    //glEnableVertexAttribArray(1);
+        cSphericalHarmonics::calculateSphericalHarmonic(points + i, l, m);
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindVertexArray(0);
+        glBindVertexArray(*(VAO + i));
+        glBindBuffer(GL_ARRAY_BUFFER, *(VBO + i));
+        glBufferData(GL_ARRAY_BUFFER, ((points + i)->size - 1) * sizeof(double), (points + i)->p_array, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *(EBO + i));
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (points + i)->size_ind * sizeof(unsigned int), (points + i)->ind_array, GL_STATIC_DRAW);
+
+        glVertexAttribLPointer(0, 3, GL_DOUBLE, 4 * sizeof(double), (void*)(0));
+        glEnableVertexAttribArray(0);
+
+
+        glVertexAttribLPointer(1, 1, GL_DOUBLE, 4 * sizeof(double), (void*)(3 * sizeof(double)));
+        glEnableVertexAttribArray(1);
+
+        //glVertexAttribLPointer(1, 1, GL_DOUBLE, 4 * sizeof(double), (void*)(3 * sizeof(double)));
+        //glEnableVertexAttribArray(1);
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindVertexArray(0);
+
+        if (l == m) {
+            l++;
+            m = -l;
+        }
+        else {
+            m++;
+        }
+
+    }
 }
 
 void Engine::processInput(GLFWwindow* window, double* delta_time)

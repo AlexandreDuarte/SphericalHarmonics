@@ -35,9 +35,9 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 
 	double* L = (double*)malloc(sizeof(double));
 
-	for (double p = 0.0; p <= 2 * pi; p += (0.005) * pi) {
+	for (double p = 0.0; p <= 2 * pi; p += (0.01) * pi) {
 		p_x = std::cos(mm * p);
-		for (double t = 0; t <= pi; t += (0.005) * pi) {
+		for (double t = 0; t <= pi; t += (0.01) * pi) {
 			x = std::cos(t);
 			y = std::sin(t);
 
@@ -55,9 +55,9 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 
 	double pp = 0, tt = 0;
 
-	for (double p = 0.0; p <= 2 * pi; p += (0.005) * pi) {
+	for (double p = 0.0; p <= 2 * pi; p += (0.01) * pi) {
 		p_x = std::cos(mm * p);
-		for (double t = 0; t <= pi; t += (0.005) * pi) {
+		for (double t = 0; t <= pi; t += (0.01) * pi) {
 			x = std::cos(t);
 			y = std::sin(t);
 
@@ -82,12 +82,12 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 	for (int loop = 0; loop <= 1; loop++) {
 	std::cout << loop << std::endl;
 	offset = size_ind/2;
-	for (unsigned int k = 0; k < 401; k++) {
-		for (unsigned int i = 0; i < 201; i++) {
+	for (unsigned int k = 0; k < 201; k++) {
+		for (unsigned int i = 0; i < 101; i++) {
 
-			*(ind + size_ind) = offset + i + 0 + (k) * (201);
+			*(ind + size_ind) = offset + i + 0 + (k) * (101);
 
-			*(ind + size_ind + 1) = offset + i + (k + 1) * (201);
+			*(ind + size_ind + 1) = offset + i + (k + 1) * (101);
 
 
 			size_ind += 2;
@@ -100,10 +100,15 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 
 	for (int i = 0; i < size; i++) {
 		if (nn != 3){
-			points[i] /= max_L;
-		nn++;
+			points[i] /= 3.0*max_L;
+
+			nn++;
 		}
 		else {
+
+			points[i - 3] += (double)m / 1.5;
+
+			points[i - 1] += (double)l - 2;
 			nn = 0;
 		}
 	}
