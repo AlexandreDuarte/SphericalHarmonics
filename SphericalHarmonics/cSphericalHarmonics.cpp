@@ -22,8 +22,11 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 
 	int mm;
 
+	bool negative = false;
+
 	if (m < 0) {
 		mm = -m;
+		negative = true;
 	}
 	else {
 		mm = m;
@@ -45,11 +48,16 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 
 			(*L > max_L) ? max_L = *L : max_L = max_L;
 
-
-			values.push_back(((*L)) * p_x * y * std::sin(p));
-			values.push_back(((*L)) * p_x * y * std::cos(p));
+			if (negative) {
+				values.push_back(((*L)) * p_x * y * std::sin(p));
+				values.push_back(((*L)) * p_x * y * std::cos(p));
+			}
+			else {
+				values.push_back(((*L)) * p_x * y * std::cos(p));
+				values.push_back(((*L)) * p_x * y * std::sin(p));
+			}
 			values.push_back(((*L)) * p_x * x);
-			values.push_back(x * std::sin(p));
+			values.push_back(0.5 * x * std::sin(p));
 		}
 	}
 
@@ -64,10 +72,16 @@ void cSphericalHarmonics::calculateSphericalHarmonic(cSphericalHarmonics::points
 			calculateLegendrePolynomial(L, x, y, (double)l, (double)mm, T);
 
 
-			values.push_back(((-*L)) * p_x * y * std::sin(p));
-			values.push_back(((-*L)) * p_x * y * std::cos(p));
+			if (negative) {
+				values.push_back(((-*L)) * p_x * y * std::sin(p));
+				values.push_back(((-*L)) * p_x * y * std::cos(p));
+			}
+			else {
+				values.push_back(((-*L)) * p_x * y * std::cos(p));
+				values.push_back(((-*L)) * p_x * y * std::sin(p));
+			}
 			values.push_back(((-*L)) * p_x * x);
-			values.push_back(x * std::sin(p));
+			values.push_back(0.5 * x * std::sin(p));
 		}
 	}
 
